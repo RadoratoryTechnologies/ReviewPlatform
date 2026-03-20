@@ -1,0 +1,82 @@
+/* print.css — Print-to-PDF styles */
+
+@media print {
+    * { color: #000 !important; background: #fff !important; }
+
+    body { font-size: 10pt; line-height: 1.4; }
+
+    /* Hide interactive elements */
+    .banner-top, .banner-bottom, .tab-nav, .export-buttons,
+    .btn, #auth-overlay, .progress-box, .item-radios { display: none !important; }
+
+    /* Show all tab panels */
+    .tab-panel { display: block !important; padding: 0; max-width: 100%; }
+
+    /* Show status as text instead of radio buttons */
+    .item-status-print {
+        display: inline-block !important;
+        font-weight: 700;
+        font-size: 9pt;
+        padding: 2px 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        float: right;
+    }
+
+    /* Section breaks */
+    .section-accordion { page-break-inside: avoid; }
+    details { display: block; }
+    details > summary { display: block; font-weight: bold; border-bottom: 1px solid #ccc; padding: 6px 0; }
+
+    /* Expand all accordions */
+    details .section-body { display: block !important; }
+
+    /* Items */
+    .checklist-item {
+        border: 1px solid #ddd !important;
+        border-left: 3px solid #999 !important;
+        padding: 6px 10px;
+        margin-bottom: 4px;
+        page-break-inside: avoid;
+    }
+
+    .checklist-item.pass { border-left-color: #22c55e !important; }
+    .checklist-item.fail { border-left-color: #ef4444 !important; }
+
+    .item-comment {
+        border: 1px solid #ddd;
+        min-height: 20px;
+        padding: 4px 8px;
+        font-size: 9pt;
+    }
+
+    .item-comment:placeholder-shown { display: none; }
+
+    /* Architecture */
+    .arch-section {
+        border: 1px solid #ddd;
+        padding: 12px;
+        margin-bottom: 8px;
+    }
+
+    .arch-section table th { background: #f0f0f0 !important; }
+
+    /* Watermark */
+    body::after {
+        content: "CONFIDENTIAL — DO NOT DISTRIBUTE";
+        position: fixed;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) rotate(-35deg);
+        font-size: 60pt;
+        font-weight: 900;
+        color: rgba(200, 0, 0, 0.06) !important;
+        z-index: 99999;
+        pointer-events: none;
+    }
+
+    /* Header */
+    .header-bar { border-bottom: 2px solid #000; padding: 8px 0; margin-top: 0; }
+
+    /* Allow text selection in print */
+    .architecture-content { user-select: auto; -webkit-user-select: auto; }
+}
