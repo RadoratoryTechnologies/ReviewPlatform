@@ -21,7 +21,6 @@ const SIGNAL_CHAIN_CHECKLIST = {
         { name: "EncoderInterface.kicad_sch", content: "AM26LV32EIDR RS-422 receiver, termination/failsafe bias, Hall Schmitt buffers (SN74LVC1G17), ESD, ferrite bead" },
         { name: "Communications.kicad_sch", content: "CP2102N USB-UART, MAX3232 RS-232 (RX source select R297/R298), ISO1044BD isolated CAN, TVS protection" },
         { name: "DigitalIO.kicad_sch", content: "6x 6N137S optocouplers, B0503S-1WR3 field isolation, STEP/DIR pulse inputs (AIO -> CLB), limit switches (AIO -> TZ), motor NTC (J13)" },
-        { name: "PowerTree.kicad_sch", content: "TPS7A2033 ultra-low-noise 3.3V LDO (analog rail), rail monitoring dividers (VSENSE_5V/VSENSE_3V3), PGOOD_12V" },
         { name: "BrakeOVP.kicad_sch", content: "OVP_STATUS export to MCU, BRAKE_ACTIVE feedback divider" },
         { name: "Inverter.kicad_sch", content: "3x 5 mOhm Kelvin shunt resistors (current sensing source)" }
     ],
