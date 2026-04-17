@@ -3,7 +3,7 @@ const POWER_STAGE_CHECKLIST = {
     project: "ServoTIv1",
     role: "Power Stage & Power Electronics Expert",
     dateIssued: "2026-04-17",
-    instructions: "This checklist covers the power stage, protection, power supply, EMI/EMC, thermal, digital I/O isolation, and chassis/PE ground aspects of the ServoTIv1 servo drive. Please mark each item as PASS / FAIL / N/A and add comments where needed.",
+    instructions: "This checklist covers the power stage, protection, power supply, EMI/EMC, thermal, and chassis/PE ground aspects of the ServoTIv1 servo drive. Please mark each item as PASS / FAIL / N/A and add comments where needed.",
     specs: [
         "DC bus: 24-60V (nominal 48V)",
         "Continuous phase current: 5A",
@@ -21,7 +21,6 @@ const POWER_STAGE_CHECKLIST = {
         { name: "GateDriver.kicad_sch", content: "DRV8353SRTAT, bootstrap caps, gate resistors (10R in Inverter), SPI-A interface, CSA anti-alias RC filters" },
         { name: "BrakeOVP.kicad_sch", content: "LM393 comparator, SCR latch (MMBTA42), CSD19535KTT brake MOSFET, 33 Ohm/35W brake resistor, OVP_STATUS export, BRAKE_ACTIVE feedback, J18 external brake connector" },
         { name: "STO_Safety.kicad_sch", content: "Safe Torque Off: 3-path disable (ENABLE + INH gating + GL clamp via 2N7002), STWD100 watchdog, test pulse, monitoring" },
-        { name: "DigitalIO.kicad_sch", content: "6x 6N137S optocouplers (3 DI + 2 pulse DI + 1 DO), B0503S-1WR3 field isolation (1500VDC), STEP/DIR pulse inputs, limit switches, motor NTC (J13)" },
         { name: "ServoTIv1.kicad_sch (root)", content: "Sheet hierarchy, rail jumpers (CRIT-PWR-1), ground domain ties (R50/R218), GND_CHASSIS net, shield drain pads (TP1-TP4), H1-H5 mounting holes" }
     ],
     sections: [
@@ -82,7 +81,7 @@ const POWER_STAGE_CHECKLIST = {
                 { id: "3.8", check: "Bypass capacitor per half-bridge", criterion: "C13/C14/C15 = 100nF/100V 1206 (one per phase, within 5mm of drain-source)", note: "Plus C59/C60/C61 = 100uF/100V electrolytic per phase. Verify 105C rating." },
                 { id: "3.9", check: "Snubber network footprints", criterion: "C74/C77-C81 (2.2nF/100V/C0G) + R43/R52-R56 (4.7R), all DNP", note: "Pads exist as rework option. DRV8353 gate drive is sufficient." },
                 { id: "3.10", check: "Motor output CM choke", criterion: "L_CM1 (PDMFAT22148D-202MLB-6P, C3011552)", note: "Verify current rating >= 5A continuous. Use single 3-phase unit, do NOT split per phase." },
-                { id: "3.11", check: "Motor phase fuses", criterion: "F2/F3/F4: 7A slow-blow (0452007.MRL, NANO2, 72VAC/60VDC)", note: "At 60V bus = zero VDC margin. Verify interrupt capacity." },
+                { id: "3.11", check: "Motor phase fuses", criterion: "F2/F3/F4: 12A slow-blow (0452012.MRL, NANO2, 72VAC/60VDC)", note: "At 60V bus = zero VDC margin. Verify interrupt capacity." },
                 { id: "3.12", check: "Motor connector rating", criterion: "J2: Phoenix Contact MSTBA 3-pin 5.08mm screw terminal", note: "" },
                 { id: "3.13", check: "Shunt resistor value and power", criterion: "R8/R11/R14: 3x 5 mOhm, 3W, 2512 (RALEC LR2512-23R005F4). At 20A: 2.0W (67%)", note: "" },
                 { id: "3.14", check: "Shunt Kelvin sense routing", criterion: "4-wire: SH_A+/-, SH_B+/-, SH_C+/- to DRV8353 SPx/SNx", note: "CRITICAL: All 6 sense lines assigned to Analog net class for matched PCB routing." },
@@ -120,7 +119,7 @@ const POWER_STAGE_CHECKLIST = {
                 { id: "5.2", check: "LM393 comparator accuracy", criterion: "Verify offset and hysteresis vs threshold spacing", note: "3V hysteresis on brake (65.5V ON / 62.5V OFF)" },
                 { id: "5.3", check: "Brake threshold divider values", criterion: "Calculate actual trip point from resistor values", note: "" },
                 { id: "5.4", check: "OVP threshold divider values", criterion: "R64=442K; calculate actual trip point", note: "Target: 67.8V" },
-                { id: "5.5", check: "SCR latch reliability", criterion: "Q8/Q10 (MMBTA42, 300V NPN). Verify holding current, reset mechanism", note: "Reset via MCU GPIO through Q10. Replaced from MMBT3904 for voltage margin." },
+                { id: "5.5", check: "SCR latch reliability", criterion: "Q8/Q10 (MMBTA42, 300V NPN). Verify holding current, reset mechanism", note: "Reset via MCU GPIO through Q10. Replaced MMBT3904 for voltage margin." },
                 { id: "5.6", check: "Brake MOSFET rating", criterion: "CSD19535KTT: 100V, adequate for 60V bus", note: "Same part as inverter MOSFETs" },
                 { id: "5.7", check: "Brake resistor power budget", criterion: "R95: 35W @ 25% duty max; peak instantaneous = 67.8^2/33 = 139W", note: "Firmware limited: 200ms ON + 2s cooldown. Prototype only." },
                 { id: "5.8", check: "J18 external brake resistor connector", criterion: "J_BRAKE (Conn_01x02) in parallel with R95 via BRAKE_SW/VBUS labels", note: "Production external resistor option" },
@@ -149,62 +148,47 @@ const POWER_STAGE_CHECKLIST = {
         },
         {
             id: "sec7",
-            title: "Section 7: Digital I/O & Field Isolation",
-            sheet: "DigitalIO.kicad_sch",
+            title: "Section 7: Chassis/PE Ground (ECO-029)",
+            sheet: "ServoTIv1.kicad_sch (root)",
             items: [
-                { id: "7.1", check: "Field isolation DC-DC", criterion: "B0503S-1WR3 (U35, C5369462): +5V/DGND -> FIELD_VCC/FIELD_GND, 1500VDC isolation", note: "Verify isolation rating adequate for industrial field wiring" },
-                { id: "7.2", check: "Isolation domain correctness", criterion: "DI optos: LED=FIELD, output=MCU. DO opto: LED=MCU, output=FIELD.", note: "ECO-031a fixed U31/U32 pulse input domain assignment" },
-                { id: "7.3", check: "Optocoupler selection", criterion: "6x 6N137S-TA1-L (C92651, SOP-8, 3.3V native)", note: "Verify speed rating adequate for >1 MHz pulse input" },
-                { id: "7.4", check: "Pull-up resistor values", criterion: "3.3K (C22978) on all 6N137 VO outputs", note: "Within datasheet recommended 330-4K range" },
-                { id: "7.5", check: "Pulse input debounce", criterion: "NO debounce caps on STEP/DIR (pulse-optimized)", note: "C131/C132 removed. Verify clean signal at >1 MHz." },
-                { id: "7.6", check: "Limit switch Trip Zone path", criterion: "AIO239/238 -> Input X-BAR -> ePWM Trip Zone", note: "Hardware-level PWM shutdown < 1 PWM cycle" },
-                { id: "7.7", check: "Motor NTC sensor path", criterion: "J13 -> R207 (10K pull-up) + C208 (100nF) + D179 (BAT54WS clamp) -> MCU ADC A5", note: "motor_temp global label. MCU analog domain (not isolated)." },
-                { id: "7.8", check: "Isolation bypass caps", criterion: "C219 (input) and C220 (output) on B0503S-1WR3", note: "Verify values per datasheet" }
+                { id: "7.1", check: "GND_CHASSIS net exists", criterion: "H1-H4 (M3 pads) + H5 (M4 PE stud) connected to GND_CHASSIS", note: "" },
+                { id: "7.2", check: "PGND-to-GND_CHASSIS coupling", criterion: "R218 (0R, 0603) single-point tie between PGND and GND_CHASSIS", note: "PCB grounding strategy tie only, NOT safety fault-current conductor" },
+                { id: "7.3", check: "PE terminal", criterion: "H5 (MountingHole_4.3mm_M4_Pad) for ring-terminal bonding", note: "Bond resistance < 0.1 Ohm target (verify after PCB fab per IEC 61800-5-1)" },
+                { id: "7.4", check: "Shield drain pads", criterion: "TP1 (encoder J4), TP2 (Hall J8), TP3 (CAN J6), TP4 (motor J2) on GND_CHASSIS", note: "Verify placement within 5mm of cable-entry areas" },
+                { id: "7.5", check: "Mounting hole pad exposure", criterion: "No solder mask on H1-H5 annular rings; star washers for chassis bonding", note: "Layout phase item" },
+                { id: "7.6", check: "Product class declaration", criterion: "PE path conditional on Class I metal enclosure. Class II: not required.", note: "Design has not yet declared a class" }
             ]
         },
         {
             id: "sec8",
-            title: "Section 8: Chassis/PE Ground (ECO-029)",
-            sheet: "ServoTIv1.kicad_sch (root)",
+            title: "Section 8: Thermal Design",
+            sheet: "",
             items: [
-                { id: "8.1", check: "GND_CHASSIS net exists", criterion: "H1-H4 (M3 pads) + H5 (M4 PE stud) connected to GND_CHASSIS", note: "" },
-                { id: "8.2", check: "PGND-to-GND_CHASSIS coupling", criterion: "R218 (0R, 0603) single-point tie between PGND and GND_CHASSIS", note: "PCB grounding strategy tie only, NOT safety fault-current conductor" },
-                { id: "8.3", check: "PE terminal", criterion: "H5 (MountingHole_4.3mm_M4_Pad) for ring-terminal bonding", note: "Bond resistance < 0.1 Ohm target (verify after PCB fab per IEC 61800-5-1)" },
-                { id: "8.4", check: "Shield drain pads", criterion: "TP1 (encoder J4), TP2 (Hall J8), TP3 (CAN J6), TP4 (motor J2) on GND_CHASSIS", note: "Verify placement within 5mm of cable-entry areas" },
-                { id: "8.5", check: "Mounting hole pad exposure", criterion: "No solder mask on H1-H5 annular rings; star washers for chassis bonding", note: "Layout phase item" },
-                { id: "8.6", check: "Product class declaration", criterion: "PE path conditional on Class I metal enclosure. Class II: not required.", note: "Design has not yet declared a class" }
+                { id: "8.1", check: "MOSFET worst-case Tj", criterion: "Calculate at 15A peak, 45 kHz, max ambient", note: "" },
+                { id: "8.2", check: "Shunt resistor worst-case temperature", criterion: "1.125W in 2512; verify temperature rise", note: "Affects current sensing accuracy via TCR" },
+                { id: "8.3", check: "NTC placement near shunts", criterion: "TH1 (10K NTC B3435) mandatory, populated", note: "Critical for CSA thermal drift compensation" },
+                { id: "8.4", check: "DRV8353 thermal management", criterion: "Verify exposed pad connected to ground pour", note: "" },
+                { id: "8.5", check: "LM5164 thermal pad", criterion: "Verify thermal via array and copper pour", note: "PCB layout item" },
+                { id: "8.6", check: "Brake resistor thermal isolation", criterion: "R95 (33R/35W) away from sensitive components", note: "PCB layout item" },
+                { id: "8.7", check: "Pre-charge resistor thermal", criterion: "R2 (47R/10W TO-220): Peak 76.6W during 141ms", note: "Verify SOA and mounting" },
+                { id: "8.8", check: "Worst-case ambient temperature", criterion: "Verify all components rated for max operating temp", note: "Check industrial temp range (-40 to +85C) requirement" }
             ]
         },
         {
             id: "sec9",
-            title: "Section 9: Thermal Design",
+            title: "Section 9: PCB Layout Concerns",
             sheet: "",
             items: [
-                { id: "9.1", check: "MOSFET worst-case Tj", criterion: "Calculate at 15A peak, 45 kHz, max ambient", note: "" },
-                { id: "9.2", check: "Shunt resistor worst-case temperature", criterion: "1.125W in 2512; verify temperature rise", note: "Affects current sensing accuracy via TCR" },
-                { id: "9.3", check: "NTC placement near shunts", criterion: "TH1 (10K NTC B3435) mandatory, populated", note: "Critical for CSA thermal drift compensation" },
-                { id: "9.4", check: "DRV8353 thermal management", criterion: "Verify exposed pad connected to ground pour", note: "" },
-                { id: "9.5", check: "LM5164 thermal pad", criterion: "Verify thermal via array and copper pour", note: "PCB layout item" },
-                { id: "9.6", check: "Brake resistor thermal isolation", criterion: "R95 (33R/35W) away from sensitive components", note: "PCB layout item" },
-                { id: "9.7", check: "Pre-charge resistor thermal", criterion: "R2 (47R/10W TO-220): Peak 76.6W during 141ms", note: "Verify SOA and mounting" },
-                { id: "9.8", check: "Worst-case ambient temperature", criterion: "Verify all components rated for max operating temp", note: "Check industrial temp range (-40 to +85C) requirement" }
-            ]
-        },
-        {
-            id: "sec10",
-            title: "Section 10: PCB Layout Concerns",
-            sheet: "",
-            items: [
-                { id: "10.1", check: "High-current loop area minimization", criterion: "Bulk cap -> FETs -> shunt -> return must be tight", note: "" },
-                { id: "10.2", check: "Gate trace length", criterion: "< 20mm from DRV8353 to each MOSFET gate", note: "" },
-                { id: "10.3", check: "Kelvin sense trace routing", criterion: "Differential pair from shunt pads to DRV8353, no shared current path", note: "Assigned to Analog net class" },
-                { id: "10.4", check: "PGND copper pour", criterion: "Continuous under inverter, MOSFETs, shunts, bulk caps", note: "" },
-                { id: "10.5", check: "Thermal via arrays", criterion: "Under MOSFET pads, DRV8353 exposed pad, LM5164 pad", note: "" },
-                { id: "10.6", check: "Motor connector proximity", criterion: "J2 close to CM choke output; short high-current traces", note: "" },
-                { id: "10.7", check: "Brake resistor placement", criterion: "R95 thermally isolated from precision components", note: "" },
-                { id: "10.8", check: "Star ground tie point", criterion: "R190 (0R) connects AGND/DGND near shunts/ADC reference", note: "" },
-                { id: "10.9", check: "JTAG trace length", criterion: "J3 <= 6 inches (15.24 cm) from MCU JTAG pins", note: "Per F280049C datasheet Fig 6-26. If exceeded, add buffers." },
-                { id: "10.10", check: "Isolation creepage/clearance", criterion: "DigitalIO field isolation, CAN isolation: verify PCB gap", note: "B0503S-1WR3 (1500VDC), ISO1044BD (1000VDC)" }
+                { id: "9.1", check: "High-current loop area minimization", criterion: "Bulk cap -> FETs -> shunt -> return must be tight", note: "" },
+                { id: "9.2", check: "Gate trace length", criterion: "< 20mm from DRV8353 to each MOSFET gate", note: "" },
+                { id: "9.3", check: "Kelvin sense trace routing", criterion: "Differential pair from shunt pads to DRV8353, no shared current path", note: "Assigned to Analog net class" },
+                { id: "9.4", check: "PGND copper pour", criterion: "Continuous under inverter, MOSFETs, shunts, bulk caps", note: "" },
+                { id: "9.5", check: "Thermal via arrays", criterion: "Under MOSFET pads, DRV8353 exposed pad, LM5164 pad", note: "" },
+                { id: "9.6", check: "Motor connector proximity", criterion: "J2 close to CM choke output; short high-current traces", note: "" },
+                { id: "9.7", check: "Brake resistor placement", criterion: "R95 thermally isolated from precision components", note: "" },
+                { id: "9.8", check: "Star ground tie point", criterion: "R190 (0R) connects AGND/DGND near shunts/ADC reference", note: "" },
+                { id: "9.9", check: "JTAG trace length", criterion: "J3 <= 6 inches (15.24 cm) from MCU JTAG pins", note: "Per F280049C datasheet Fig 6-26. If exceeded, add buffers." },
+                { id: "9.10", check: "Isolation creepage/clearance", criterion: "DigitalIO field isolation, CAN isolation: verify PCB gap", note: "B0503S-1WR3 (1500VDC), ISO1044BD (1000VDC)" }
             ]
         }
     ]
