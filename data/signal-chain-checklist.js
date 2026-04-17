@@ -21,7 +21,8 @@ const SIGNAL_CHAIN_CHECKLIST = {
         { name: "EncoderInterface.kicad_sch", content: "AM26LV32EIDR RS-422 receiver, termination/failsafe bias, Hall Schmitt buffers (SN74LVC1G17), ESD, ferrite bead" },
         { name: "Communications.kicad_sch", content: "CP2102N USB-UART, MAX3232 RS-232 (RX source select R297/R298), ISO1044BD isolated CAN, TVS protection" },
         { name: "DigitalIO.kicad_sch", content: "6x 6N137S optocouplers, B0503S-1WR3 field isolation, STEP/DIR pulse inputs (AIO -> CLB), limit switches (AIO -> TZ), motor NTC (J13)" },
-        { name: "Inverter.kicad_sch", content: "3x 5 mOhm Kelvin shunt resistors (current sensing source)" }
+        { name: "Inverter.kicad_sch", content: "3x 5 mOhm Kelvin shunt resistors (current sensing source)" },
+        { name: "ServoTIv1.kicad_sch (root)", content: "Sheet hierarchy, inter-sheet signal routing, ground domain ties (R50/R190/R218), GND_CHASSIS net, shield drain pads (TP1-TP4)" }
     ],
     sections: [
         {
